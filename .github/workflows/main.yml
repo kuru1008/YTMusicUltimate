@@ -104,7 +104,18 @@ jobs:
 
       - name: Inject tweak into provided IPA
         run: cyan -i ytm.ipa -o YTMusicUltimate.ipa -uwsf ytmult.deb -n "${{ inputs.display_name }}" -b ${{ inputs.bundle_id }} 
+      - name: Remove embedded Watch App
+        run: |
+          mkdir ipa_unpacked
+          unzip -q YTMusicUltimate.ipa -d ipa_unpacked
 
+          find ipa_unpacked/Payload -type d -name Watch -prune -exec rm -rf {} +
+
+          cd ipa_unpacked
+          zip -qry ../YTMusicUltimate.ipa Payload
+          cd ..
+
+          rm -rf ipa_unpacked
       - name: Create Release
         uses: softprops/action-gh-release@v2.5.0
         with:
